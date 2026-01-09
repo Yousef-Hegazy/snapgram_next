@@ -1,50 +1,33 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import { AppwriteException } from 'appwrite'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { QUERY_KEYS } from './queryKeys'
-
-import {
-  createUserAccount,
-  getCurrentUser,
-  logout,
-  signInAccount,
-} from '@/lib/appwrite/authUtils'
-
-import { INITIAL_USER, useAuthContext } from '@/context/AuthContext'
-import type { IUser } from '@/types'
+import { revalidateCacheTag } from '@/actions/common'
+import { authClient } from '@/auth-client'
+import { useRouter } from 'next/navigation'
+import { QUERY_KEYS } from '../constants/queryKeys'
+import { SignUpValidationType } from '../validations'
 
 export const useCreateUserAccount = () => {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { setUser, setIsAuthenticated } = useAuthContext()
+  const router = useRouter()
   return useMutation({
-    mutationFn: createUserAccount,
-    onSuccess: (data) => {
-      const user: IUser = {
-        id: data.$id,
+    mutationFn: async (data: SignUpValidationType) => {
+      const res = await authClient.signUp.email({
         name: data.name,
-        username: data.username || '',
+        username: data.username,
         email: data.email,
-        imageUrl: data.imageUrl,
-        bio: data.bio || '',
-        followeesCount: data.followeesCount || 0,
-        followersCount: data.followersCount || 0,
-        postCount: data.postCount || 0,
+        password: data.password,
+      });
+
+      if (res.error) {
+        throw new Error(res.error.message);
       }
-      setUser(user)
 
-      setIsAuthenticated(true)
+      return res.data;
+    },
+    onSuccess: async () => {
+      await revalidateCacheTag([QUERY_KEYS.GET_CURRENT_USER, "max"]);
 
-      queryClient.setQueryData([QUERY_KEYS.GET_CURRENT_USER], data, {
-        updatedAt: Date.now(),
-      })
-
-      navigate({
-        to: '/posts',
-        replace: true,
-      })
+      router.push('/posts')
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to create account')
@@ -53,77 +36,38 @@ export const useCreateUserAccount = () => {
 }
 
 export const useSignInAccount = () => {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { setUser, setIsAuthenticated } = useAuthContext()
+  const router = useRouter()
 
   return useMutation({
-    mutationFn: signInAccount,
-    onSuccess: (data) => {
-      const user: IUser = {
-        id: data.$id,
-        name: data.name,
-        username: data.username || '',
+    mutationFn: async (data: { email: string; password: string }) => {
+      const res = await authClient.signIn.email({
         email: data.email,
-        imageUrl: data.imageUrl,
-        bio: data.bio || '',
-        followeesCount: data.followeesCount || 0,
-        followersCount: data.followersCount || 0,
-        postCount: data.postCount || 0,
+        password: data.password,
+      });
+
+      if (res.error) {
+        throw new Error(res.error.message);
       }
-      setUser(user)
 
-      setIsAuthenticated(true)
-
-      queryClient.setQueryData([QUERY_KEYS.GET_CURRENT_USER], data, {
-        updatedAt: Date.now(),
-      })
-
-      navigate({
-        to: '/posts',
-        replace: true,
-      })
+      return res.data;
+    },
+    onSuccess: async () => {
+      await revalidateCacheTag([QUERY_KEYS.GET_CURRENT_USER, "max"]);
+      router.push('/posts')
     },
     onError: (error) => {
-      if (error instanceof AppwriteException) {
-        toast.error(error.message)
-        return
-      }
-      toast.error(
-        error.message || 'Failed to sign in, please try again or contact us.',
-      )
+      toast.error(error.message || 'Failed to sign in')
     },
-  })
-}
-
-export const useGetCurrentUser = () => {
-  return useQuery({
-    queryKey: [QUERY_KEYS.GET_CURRENT_USER],
-    queryFn: getCurrentUser,
-    staleTime: 300_000, // 5 minutes
   })
 }
 
 export const useLogout = () => {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { setUser, setIsAuthenticated } = useAuthContext()
+  const router = useRouter()
   return useMutation({
-    mutationFn: async () => {
-      await logout()
-    },
+    mutationFn: () => authClient.signOut(),
     onSuccess: async () => {
-      navigate({
-        to: '/sign-in',
-        replace: true,
-      })
-
-      setUser(INITIAL_USER)
-      setIsAuthenticated(false)
-
-      queryClient.setQueryData([QUERY_KEYS.GET_CURRENT_USER], null, {
-        updatedAt: Date.now(),
-      })
+      await revalidateCacheTag([QUERY_KEYS.GET_CURRENT_USER, "max"]);
+      router.push('/sign-in')
     },
   })
 }

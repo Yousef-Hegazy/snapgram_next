@@ -48,3 +48,5 @@ export const bottombarLinks = [
     label: 'Create',
   },
 ]
+
+export const DEFAULT_CACHE_DURATION = 60 * 5 // 5 minutes

@@ -1,3 +1,5 @@
+"use client";
+
 import { useLogout } from "@/lib/react-query";
 import Image from "next/image";
 import { Button } from "./button";

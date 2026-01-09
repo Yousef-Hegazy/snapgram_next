@@ -1,5 +1,5 @@
 {
-  "id": "87c47402-263d-43eb-9d5a-d781659e5332",
+  "id": "b1eefa04-bfdc-4b13-96db-ff8a7f7054e3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -608,6 +608,12 @@
         },
         "username": {
           "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_username": {
+          "name": "display_username",
           "type": "text",
           "primaryKey": false,
           "notNull": false

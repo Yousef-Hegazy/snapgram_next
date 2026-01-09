@@ -7,7 +7,7 @@ const Topbar = ({ user }: { user: User }) => {
   return (
     <section className="topbar">
       <div className="flex-between py-4 px-5">
-        <Link href="/" className="flex gap-3 items-center">
+        <Link href="/posts" className="flex gap-3 items-center">
           <Image src="/images/logo.svg" alt="Snapgram Logo" width={130} height={130} />
         </Link>
 
@@ -16,7 +16,7 @@ const Topbar = ({ user }: { user: User }) => {
 
           <Link href={`/profile/${user.id}`} className="flex-center gap-3">
             <Image
-              src={user.imageUrl || "/images/profile-placeholder.svg"}
+              src={user.imageUrl || "/icons/profile-placeholder.svg"}
               alt="profile"
               width={32}
               height={32}

@@ -25,6 +25,7 @@ export async function createPost({
   let imageId = '';
   let imageUrl = '';
 
+
   try {
     if (file && file.size > 0) {
       uploadedNew = await uploadFile(file);
@@ -38,7 +39,7 @@ export async function createPost({
         caption,
         location: location || null,
         tags: tags || [],
-        image_url: imageUrl || '',
+        imageUrl: imageUrl || '',
         imageId: imageId || '',
       }).returning();
 
@@ -84,7 +85,7 @@ export async function editPost({
   if (existing.creatorId !== userId) throw new Error('You are not authorized to edit this post');
 
   let imageId = existing.imageId || '';
-  let imageUrl = existing.image_url || '';
+  let imageUrl = existing.imageUrl || '';
   let uploadedNew: { key: string; url: string } | null = null;
 
   try {
@@ -99,7 +100,7 @@ export async function editPost({
         caption,
         location: location ?? existing.location,
         tags: tags ?? existing.tags,
-        image_url: imageUrl || '',
+        imageUrl: imageUrl || '',
         imageId: imageId || '',
       }).where(eq(posts.id, id)).returning();
 
@@ -153,13 +154,13 @@ export async function deletePost(postId: string, userId: string): Promise<null> 
 }
 
 
-export async function toggleLike(postId: string, userId: string): Promise<Like | null> {
+export async function toggleLikePost(postId: string, userId: string): Promise<Like | null> {
   const result = await db.transaction(async (tx) => {
     const [existing] = await tx.select({
       id: likes.id,
       postId: likes.postId,
       userId: likes.userId,
-    }).from(likes).where(and(eq(likes.postId, postId), eq(likes.userId, userId)));
+    }).from(likes).where(and(eq(likes.postId, postId), eq(likes.userId, userId))).limit(1);
     if (existing) {
       await tx.delete(likes).where(eq(likes.id, existing.id));
       return null;
@@ -172,10 +173,10 @@ export async function toggleLike(postId: string, userId: string): Promise<Like |
   return result;
 }
 
-export async function toggleSave(postId: string, userId: string): Promise<Save | null> {
+export async function toggleSavePost(postId: string, userId: string): Promise<Save | null> {
   const result = await db.transaction(async (tx) => {
 
-    const [existing] = await tx.select().from(saves).where(and(eq(saves.postId, postId), eq(saves.userId, userId)));
+    const [existing] = await tx.select().from(saves).where(and(eq(saves.postId, postId), eq(saves.userId, userId))).limit(1);
     if (existing) {
       await tx.delete(saves).where(eq(saves.id, existing.id));
       return null;

@@ -1,7 +1,7 @@
 import sharp from "sharp";
 
 const DEFAULT_MAX_WIDTH = 2000;
-const DEFAULT_QUALITY = 80;
+const DEFAULT_QUALITY = 100;
 
 export async function compressImage(file: File, maxWidth = DEFAULT_MAX_WIDTH, quality = DEFAULT_QUALITY) {
   const arrayBuffer = await file.arrayBuffer();

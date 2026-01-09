@@ -7,6 +7,8 @@ export const SignUpValidation = z.object({
     password: z.string().min(8, { error: "Password must be at least 8 characters long" })
 });
 
+export type SignUpValidationType = z.infer<typeof SignUpValidation>;
+
 export const SignInValidation = z.object({
     email: z.email(),
     password: z.string().min(8, { error: "Password must be at least 8 characters long" })
@@ -18,6 +20,9 @@ export const PostValidation = z.object({
     location: z.string().min(2, { error: "Location is too short" }).max(100, { error: "Location is too long" }),
     tags: z.string(),
 });
+
+
+export type PostValidationType = z.infer<typeof PostValidation>
 
 export const ProfileUpdateValidation = z.object({
     name: z.string().min(2, { error: "Too short" }),

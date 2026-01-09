@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import type { INavLink } from "@/types";
 import Image from "next/image";

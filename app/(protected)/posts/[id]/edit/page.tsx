@@ -28,6 +28,10 @@ const EditPostPage = async ({ params }: Props) => {
     return redirect("/sign-in", RedirectType.replace);
   }
 
+  if (!post || post.creatorId !== user.id) {
+    return redirect("/posts", RedirectType.replace);
+  }
+
   return (
     <div className="flex flex-1 w-full">
       <div className="common-container">

@@ -498,6 +498,6 @@
   }
 
   body {
-    @apply bg-dark-1 text-white min-h-screen font-inter;
+    @apply bg-dark-1 text-white min-h-screen font-inter max-w-480 w-full mx-auto;
   }
 }

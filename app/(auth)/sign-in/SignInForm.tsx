@@ -54,7 +54,7 @@ export default function SignInForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" className="shad-input" {...field} />
+                  <Input type="email" className="shad-input" autoComplete="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

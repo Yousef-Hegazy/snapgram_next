@@ -64,9 +64,9 @@ export const useEditPost = () => {
 /**
  * Hook to fetch paginated posts using Hono RPC client
  */
-export const useGetInfinitePosts = (limit: number = 10) => {
+export const useGetInfinitePosts = (limit: number = 10, currentUserId: string) => {
     return useInfiniteQuery({
-        queryKey: [QUERY_KEYS.GET_POSTS, QUERY_KEYS.GET_INFINITE_POSTS, limit],
+        queryKey: [QUERY_KEYS.GET_POSTS, QUERY_KEYS.GET_INFINITE_POSTS, limit, currentUserId],
         queryFn: async ({ pageParam }) => {
             const response = await postsApi.$get({
                 query: {
@@ -80,6 +80,38 @@ export const useGetInfinitePosts = (limit: number = 10) => {
             if (!json.success) {
                 const errorJson = json as unknown as { success: false; error: { message: string } };
                 throw new Error(errorJson.error.message || 'Failed to fetch posts');
+            }
+
+            return json.data;
+        },
+        getNextPageParam: (lastPage) => {
+            if (!lastPage.hasMore) return undefined;
+            return lastPage.nextPage ?? undefined;
+        },
+        initialPageParam: 1,
+        staleTime: 300_000, // 5 minutes
+    });
+}
+
+/**
+ * Hook to fetch paginated saved posts using Hono RPC client
+ */
+export const useGetInfiniteSavedPosts = (limit: number = 10, currentUserId: string) => {
+    return useInfiniteQuery({
+        queryKey: [QUERY_KEYS.GET_POSTS, QUERY_KEYS.GET_SAVED_POSTS, QUERY_KEYS.GET_INFINITE_POSTS, limit, currentUserId],
+        queryFn: async ({ pageParam }) => {
+            const response = await postsApi.saved.$get({
+                query: {
+                    page: pageParam.toString(),
+                    limit: limit.toString(),
+                },
+            });
+
+            const json = await response.json();
+
+            if (!json.success) {
+                const errorJson = json as unknown as { success: false; error: { message: string } };
+                throw new Error(errorJson.error.message || 'Failed to fetch saved posts');
             }
 
             return json.data;

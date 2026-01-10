@@ -1,22 +1,15 @@
-import type { Users } from '@/appwrite/types/appwrite'
+import type { User } from '@/db/schema-types'
 
-const useIsFollowing = (currentUserId: string, user?: Users) => {
+const useIsFollowing = (currentUserId: string, user?: User & { isFollowing?: boolean }) => {
   if (!user) {
     return { isFollowing: false, isCurrentUser: false }
   }
 
-  const isCurrentUser = user.$id === currentUserId
+  const isCurrentUser = user.id === currentUserId
 
-  const isFollowing =
-    !isCurrentUser &&
-    user.followersCount &&
-    (user.followers || [])?.find((follower) =>
-      typeof follower.follower === 'object'
-        ? follower.follower.$id === currentUserId
-        : String(follower.follower) === currentUserId,
-    )
+  const isFollowing = user.isFollowing ?? false
 
-  return { isFollowing: Boolean(isFollowing), isCurrentUser }
+  return { isFollowing, isCurrentUser }
 }
 
 export default useIsFollowing

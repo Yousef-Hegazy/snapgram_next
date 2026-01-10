@@ -1,66 +1,57 @@
-import type { Likes, Posts, Saves } from '@/appwrite/types/appwrite'
-import { useAuthContext } from '@/context/AuthContext'
-import { Link } from '@tanstack/react-router'
+"use client"
+
+import type { PostWithMetadata } from '@/types/posts'
+import Link from 'next/link'
+import Image from 'next/image'
 import { PostStats } from './PostCard/PostStats'
 
 const GridPostList = ({
   posts,
   showUser = true,
   showStats = true,
-  isLikedPosts = false,
-  isSavedPosts = false,
+  currentUserId,
 }: {
-  posts: Posts[] | Saves[] | Likes[]
+  posts: PostWithMetadata[]
   showUser?: boolean
   showStats?: boolean
-  isLikedPosts?: boolean
-  isSavedPosts?: boolean
+  currentUserId?: string
 }) => {
-  const { user } = useAuthContext()
-
   return (
     <ul className="grid-container">
-      {posts.map((postOrSave) => {
-        let post
-        if ('post' in postOrSave) {
-          post = postOrSave.post
-        } else {
-          post = postOrSave
-        }
-
+      {posts.map((post) => {
         return (
-          <li key={post.$id} className="relative min-w-80 h-80">
-            <Link
-              to="/posts/$id"
-              params={{ id: post.$id }}
-              className="grid-post_link"
-            >
-              <img
-                src={post.imageUrl}
-                alt={post.caption || 'post'}
-                className="object-cover w-full h-full"
-              />
+          <li key={post.id} className="relative min-w-80 h-80">
+            <Link href={`/posts/${post.id}`} className="grid-post_link">
+              <div className="w-full h-full relative">
+                <Image
+                  src={post.imageUrl}
+                  alt={post.caption || 'post'}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover w-full h-full"
+                />
+              </div>
             </Link>
 
             <div className="grid-post_user">
               {showUser ? (
                 <div className="flex items-center justify-start gap-2 flex-1">
-                  <img
-                    src={post.creator.imageUrl}
-                    alt="creator"
-                    className="size-8 rounded-full"
+                  <Image
+                    src={post.creator?.imageUrl || '/icons/profile-placeholder.svg'}
+                    alt={post.creator?.name || 'creator'}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
                   />
 
-                  <p className="line-clamp-1">{post.creator.name}</p>
+                  <p className="line-clamp-1">{post.creator?.name ?? 'Unknown'}</p>
                 </div>
               ) : null}
 
               {showStats ? (
                 <PostStats
                   post={post}
-                  userId={user.id}
-                  isLikedPosts={isLikedPosts}
-                  isSavedPosts={isSavedPosts}
+                  userId={currentUserId}
                 />
               ) : null}
             </div>

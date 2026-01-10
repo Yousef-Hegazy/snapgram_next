@@ -21,3 +21,4 @@ export const client = hc<AppType>(getBaseUrl());
 
 // Export the API client for posts
 export const postsApi = client.api.posts;
+export const usersApi = client.api.users;

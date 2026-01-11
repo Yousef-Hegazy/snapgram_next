@@ -10,7 +10,6 @@ export const env = createEnv({
     S3_BUCKET_NAME: z.string(),
     S3_REGION: z.string(),
     BETTER_AUTH_SECRET: z.string(),
-    BETTER_AUTH_URL: z.url(),
   },
   client: {
     // No client-exposed variables for now. Add NEXT_PUBLIC_* keys here if needed.
@@ -23,6 +22,5 @@ export const env = createEnv({
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
     S3_REGION: process.env.S3_REGION,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
-    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
   },
 });

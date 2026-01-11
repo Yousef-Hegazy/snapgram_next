@@ -1,9 +1,10 @@
-import { createPost, editPost, toggleLikePost, toggleSavePost } from '@/actions/posts'
+import { createPost, deletePost, editPost, toggleLikePost, toggleSavePost } from '@/actions/posts'
 import { postsApi } from '@/lib/hono-client'
 import { INewPost } from '@/types'
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { DEFAULT_CACHE_DURATION } from '../constants'
 import { QUERY_KEYS } from '../constants/queryKeys'
 
 export const useCreatePost = () => {
@@ -64,14 +65,17 @@ export const useEditPost = () => {
 /**
  * Hook to fetch paginated posts using Hono RPC client
  */
-export const useGetInfinitePosts = (limit: number = 10, currentUserId: string) => {
+export const useGetInfinitePosts = ({ limit = 10, currentUserId, query, creatorId, likedId }: { limit?: number, currentUserId: string, query?: string; creatorId?: string; likedId?: string }) => {
     return useInfiniteQuery({
-        queryKey: [QUERY_KEYS.GET_POSTS, QUERY_KEYS.GET_INFINITE_POSTS, limit, currentUserId],
+        queryKey: [QUERY_KEYS.GET_POSTS, QUERY_KEYS.GET_INFINITE_POSTS, limit, currentUserId, query, creatorId, likedId],
         queryFn: async ({ pageParam }) => {
             const response = await postsApi.$get({
                 query: {
                     page: pageParam.toString(),
                     limit: limit.toString(),
+                    searchQuery: query || "",
+                    creatorId: creatorId || undefined,
+                    likedId: likedId || undefined,
                 },
             });
 
@@ -89,7 +93,7 @@ export const useGetInfinitePosts = (limit: number = 10, currentUserId: string) =
             return lastPage.nextPage ?? undefined;
         },
         initialPageParam: 1,
-        staleTime: 300_000, // 5 minutes
+        staleTime: DEFAULT_CACHE_DURATION, // 5 minutes
     });
 }
 
@@ -121,7 +125,7 @@ export const useGetInfiniteSavedPosts = (limit: number = 10, currentUserId: stri
             return lastPage.nextPage ?? undefined;
         },
         initialPageParam: 1,
-        staleTime: 300_000, // 5 minutes
+        staleTime: DEFAULT_CACHE_DURATION, // 5 minutes
     });
 }
 
@@ -162,6 +166,29 @@ export const useSavePost = () => {
         },
         onError: (error) => {
             toast.error(error.message || 'Failed to save post');
+        },
+    });
+};
+
+/**
+ * Hook to delete a post
+ */
+export const useDeletePost = () => {
+    const queryClient = useQueryClient();
+    const router = useRouter();
+
+    return useMutation({
+        mutationFn: async ({ postId, userId }: { postId: string; userId: string }) => deletePost(postId, userId),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_POSTS],
+                type: 'all',
+            });
+
+            router.replace("/posts");
+        },
+        onError: (error) => {
+            toast.error(error.message || 'Failed to delete post');
         },
     });
 };

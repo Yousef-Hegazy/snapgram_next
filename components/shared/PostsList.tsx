@@ -15,7 +15,7 @@ export function PostsList({ currentUserId }: Props) {
     isPending,
     hasNextPage,
     fetchNextPage,
-  } = useGetInfinitePosts(10, currentUserId || "");
+  } = useGetInfinitePosts({ limit: 10, currentUserId: currentUserId || "" });
 
   if (isPending) {
     return (

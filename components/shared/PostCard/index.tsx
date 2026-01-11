@@ -22,7 +22,7 @@ const PostCard = ({ post, currentUserId }: Props) => {
               alt="creator"
               width={48}
               height={48}
-              className="rounded-full"
+              className="rounded-full size-12 overflow-hidden object-top object-cover"
             />
           </Link>
 

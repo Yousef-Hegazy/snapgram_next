@@ -5,16 +5,12 @@ import type { AppType } from '@/server';
 // In development, use relative URL; in production, use absolute URL
 const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
-        // Browser should use relative path
-        return '';
+        // Browser: infer base URL from the current location so we don't need an env var
+        // This makes the client work on any host (dev or prod) without manual config
+        return window.location.origin;
     }
 
-    // SSR should use absolute URL
-    if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}`;
-    }
-
-    return `http://localhost:${process.env.PORT ?? 3000}`;
+    return "";
 };
 
 export const client = hc<AppType>(getBaseUrl());

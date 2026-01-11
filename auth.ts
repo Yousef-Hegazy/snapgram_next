@@ -26,4 +26,7 @@ export const auth = betterAuth({
             imageUrl: { type: "string" },
         }
     },
+    advanced: {
+        cookiePrefix: "snapgram",
+    }
 });

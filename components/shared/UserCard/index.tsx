@@ -19,7 +19,7 @@ const UserCard = ({ user, currentUserId }: Props) => {
         alt={user.name}
         width={56}
         height={56}
-        className="rounded-full w-14 h-14"
+        className="rounded-full size-14 overflow-hidden object-top object-cover"
       />
 
       <div className="flex-center flex-col gap-1">

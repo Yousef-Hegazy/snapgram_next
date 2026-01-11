@@ -11,7 +11,15 @@ type Props = {
 };
 
 export default function CommunityClient({ currentUserId = "" }: Props) {
-  const { data: users, isPending, fetchNextPage, hasNextPage } = useGetInfiniteUsers(10, currentUserId);
+  const {
+    data: users,
+    isPending,
+    fetchNextPage,
+    hasNextPage,
+  } = useGetInfiniteUsers({
+    limit: 12,
+    currentUserId,
+  });
 
   return (
     <InfiniteQueryContainer fetchNextPage={fetchNextPage} hasNextPage={hasNextPage}>

@@ -1,40 +1,42 @@
-import { useAuthContext } from '@/context/AuthContext'
-import { useGetInfiniteFollowers } from '@/lib/react-query'
-import Loader from '../ui/Loader'
-import InfiniteQueryContainer from './InfiniteQueryContainer'
-import UserCard from './UserCard'
+"use client";
+
+import { User } from "@/db/schema-types";
+import { useGetInfiniteUsers } from "@/lib/react-query";
+import Loader from "../ui/Loader";
+import InfiniteQueryContainer from "./InfiniteQueryContainer";
+import UserCard from "./UserCard";
 
 type Props = {
-  userId: string
-}
+  userId: string;
+  currentUserId: string;
+};
 
-const Followers = ({ userId }: Props) => {
-  const { user: currentUser } = useAuthContext()
+const Followers = ({ userId, currentUserId }: Props) => {
   const {
     data: users,
     hasNextPage,
     fetchNextPage,
     isPending,
-  } = useGetInfiniteFollowers(userId)
+  } = useGetInfiniteUsers({
+    followeeId: userId,
+    currentUserId: currentUserId,
+  });
 
   return (
-    <InfiniteQueryContainer
-      fetchNextPage={fetchNextPage}
-      hasNextPage={hasNextPage}
-    >
+    <InfiniteQueryContainer fetchNextPage={fetchNextPage} hasNextPage={hasNextPage}>
       <div className="user-container">
         {isPending ? (
           <Loader />
         ) : users?.pages ? (
           <ul className="user-grid">
             {users.pages.map((page) =>
-              page.rows.map((follow) => (
+              page.items.map((follow) => (
                 <UserCard
-                  key={follow.$id}
-                  user={follow.follower}
-                  currentUserId={currentUser.id}
+                  key={follow.id}
+                  user={follow as unknown as User & { isFollowing?: boolean }}
+                  currentUserId={currentUserId}
                 />
-              )),
+              ))
             )}
           </ul>
         ) : (
@@ -42,7 +44,7 @@ const Followers = ({ userId }: Props) => {
         )}
       </div>
     </InfiniteQueryContainer>
-  )
-}
+  );
+};
 
-export default Followers
+export default Followers;

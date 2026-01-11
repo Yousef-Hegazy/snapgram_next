@@ -20,7 +20,7 @@ const Topbar = ({ user }: { user: User }) => {
               alt="profile"
               width={32}
               height={32}
-              className="rounded-full"
+              className="rounded-full size-8 overflow-hidden object-top object-cover"
             />
           </Link>
         </div>

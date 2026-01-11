@@ -1,21 +1,26 @@
-import { useAuthContext } from '@/context/AuthContext'
-import { useGetInfiniteFollowings } from '@/lib/react-query'
+"use client";
+
+import { useGetInfiniteUsers } from '@/lib/react-query'
 import Loader from '../ui/Loader'
 import FollowingCard from './FollowingCard'
 import InfiniteQueryContainer from './InfiniteQueryContainer'
 
 type Props = {
   userId: string
+  currentUserId: string;
 }
 
-const Followings = ({ userId }: Props) => {
-  const { user } = useAuthContext()
+const Followings = ({ userId, currentUserId }: Props) => {
   const {
     data: users,
     isPending,
     fetchNextPage,
     hasNextPage,
-  } = useGetInfiniteFollowings(userId)
+  } = useGetInfiniteUsers({
+    followerId: userId,
+    currentUserId: currentUserId
+  });
+
 
   return (
     <InfiniteQueryContainer
@@ -28,11 +33,11 @@ const Followings = ({ userId }: Props) => {
         ) : users?.pages ? (
           <ul className="user-grid">
             {users.pages.map((page) =>
-              page.rows.map((follow) => (
+              page.items.map((follow) => (
                 <FollowingCard
-                  key={follow.$id}
+                  key={follow.id}
                   follow={follow}
-                  currentUserId={user.id}
+                  currentUserId={currentUserId}
                 />
               )),
             )}

@@ -1,40 +1,42 @@
-import { useGetInfinitePosts } from '@/lib/react-query'
-import Loader from '../ui/Loader'
-import GridPostList from './GridPostList'
-import InfiniteQueryContainer from './InfiniteQueryContainer'
+"use client";
+
+import { useGetInfinitePosts } from "@/lib/react-query";
+import Loader from "../ui/Loader";
+import GridPostList from "./GridPostList";
+import InfiniteQueryContainer from "./InfiniteQueryContainer";
 
 type Props = {
-  userId: string
-}
+  userId: string;
+  currentUserId: string;
+};
 
-const ProfileUserPosts = ({ userId }: Props) => {
+const ProfileUserPosts = ({ userId, currentUserId }: Props) => {
   const {
     data: posts,
     isPending,
     hasNextPage,
     fetchNextPage,
-  } = useGetInfinitePosts(userId)
+  } = useGetInfinitePosts({ currentUserId, creatorId: userId });
 
   return (
-    <InfiniteQueryContainer
-      fetchNextPage={fetchNextPage}
-      hasNextPage={hasNextPage}
-    >
+    <InfiniteQueryContainer fetchNextPage={fetchNextPage} hasNextPage={hasNextPage}>
       {isPending ? (
         <Loader />
       ) : posts && posts.pages ? (
         posts.pages.map((page, index) => (
           <GridPostList
             key={`page-${index}`}
-            posts={page.rows}
+            posts={page.items}
             showUser={false}
+            currentUserId={currentUserId}
+            showStats
           />
         ))
       ) : (
         <p>No posts found.</p>
       )}
     </InfiniteQueryContainer>
-  )
-}
+  );
+};
 
-export default ProfileUserPosts
+export default ProfileUserPosts;

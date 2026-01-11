@@ -3,11 +3,15 @@ interface StabBlockProps {
   label: string;
 }
 
-const StatBlock = ({ value, label }: StabBlockProps) => (
-  <div className="flex-center gap-2">
-    <p className="small-semibold lg:body-bold text-primary-500">{value}</p>
-    <p className="small-medium lg:base-medium text-light-2">{label}</p>
-  </div>
-);
+const StatBlock = ({ value, label }: StabBlockProps) => {
+  const displayValue = typeof value === 'number' && value > 99 ? '99+' : value;
+
+  return (
+    <div className="flex-center gap-2">
+      <p className="small-semibold lg:body-bold text-primary-500">{displayValue}</p>
+      <p className="small-medium lg:base-medium text-light-2">{label}</p>
+    </div>
+  );
+};
 
 export default StatBlock;

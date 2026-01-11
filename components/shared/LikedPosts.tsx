@@ -1,41 +1,40 @@
-import { useGetInfiniteLikedPosts } from '@/lib/react-query'
-import Loader from '../ui/Loader'
-import GridPostList from './GridPostList'
-import InfiniteQueryContainer from './InfiniteQueryContainer'
+"use client";
+
+import { useGetInfinitePosts } from "@/lib/react-query";
+import Loader from "../ui/Loader";
+import GridPostList from "./GridPostList";
+import InfiniteQueryContainer from "./InfiniteQueryContainer";
 
 type Props = {
-  userId: string
-}
+  userId: string;
+  currentUserId: string;
+};
 
-const LikedPosts = ({ userId }: Props) => {
+const LikedPosts = ({ userId, currentUserId }: Props) => {
   const {
     data: posts,
     isPending,
     isError,
     hasNextPage,
     fetchNextPage,
-  } = useGetInfiniteLikedPosts(userId)
+  } = useGetInfinitePosts({
+    currentUserId: currentUserId,
+    likedId: userId,
+  });
 
   return (
-    <InfiniteQueryContainer
-      fetchNextPage={fetchNextPage}
-      hasNextPage={hasNextPage}
-    >
+    <InfiniteQueryContainer fetchNextPage={fetchNextPage} hasNextPage={hasNextPage}>
       {isPending ? (
         <Loader />
       ) : !posts || !posts.pages || isError ? (
         <p>No liked posts found.</p>
       ) : (
         posts.pages.map((page, index) => (
-          <GridPostList
-            key={`page-${index}`}
-            posts={page.rows}
-            isLikedPosts={true}
-          />
+          <GridPostList key={`page-${index}`} posts={page.items} currentUserId={currentUserId} showStats showUser />
         ))
       )}
     </InfiniteQueryContainer>
-  )
-}
+  );
+};
 
-export default LikedPosts
+export default LikedPosts;

@@ -2,7 +2,7 @@ import { user } from '@/db/auth-schema';
 import { db } from '@/db/client';
 import { likes, posts, saves } from '@/db/db-schema';
 import { zValidator } from '@hono/zod-validator';
-import { desc, eq, sql, and } from 'drizzle-orm';
+import { and, desc, eq, like, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { getCurrentUser } from '../lib/auth';
@@ -12,6 +12,9 @@ import type { SuccessResponse } from '../lib/hono';
 const paginationSchema = z.object({
     page: z.coerce.number().min(1).default(1),
     limit: z.coerce.number().min(1).max(50).default(10),
+    searchQuery: z.string().optional(),
+    creatorId: z.string().optional(),
+    likedId: z.string().optional(),
 });
 
 // Create the posts router
@@ -20,7 +23,7 @@ const postsRouter = new Hono()
         '/',
         zValidator('query', paginationSchema),
         async (c) => {
-            const { page, limit } = c.req.valid('query');
+            const { page, limit, searchQuery, creatorId, likedId } = c.req.valid('query');
             const currentUser = await getCurrentUser();
             const currentUserId = currentUser?.id || "";
 
@@ -72,6 +75,16 @@ const postsRouter = new Hono()
                 })
                 .from(posts)
                 .leftJoin(user, eq(posts.creatorId, user.id))
+                .where(and(
+                    creatorId ? eq(posts.creatorId, creatorId) : undefined,
+                    searchQuery ? like(posts.caption, `%${searchQuery}%`) : undefined,
+                    likedId
+                        ? sql`${posts.id} IN (
+                            SELECT ${likes.postId} FROM ${likes}
+                            WHERE ${likes.userId} = ${likedId}
+                        )`
+                        : undefined
+                ))
                 .orderBy(desc(posts.createdAt), desc(posts.id))
                 .limit(limit + 1)
                 .offset(offset);

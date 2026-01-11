@@ -1,47 +1,47 @@
-import { useCallback, useState } from 'react'
-import { type FileWithPath, useDropzone } from 'react-dropzone'
+import Image from "next/image";
+import { useCallback, useState } from "react";
+import { type FileWithPath, useDropzone } from "react-dropzone";
 
 type ProfileUploaderProps = {
-  fieldChange: (files: File[]) => void
-  mediaUrl: string
-}
+  fieldChange: (files: File[]) => void;
+  mediaUrl: string;
+};
 
 const ProfileUploader = ({ fieldChange, mediaUrl }: ProfileUploaderProps) => {
-  const [file, setFile] = useState<File[]>([])
-  const [fileUrl, setFileUrl] = useState<string>(mediaUrl)
+  const [fileUrl, setFileUrl] = useState<string>(mediaUrl);
 
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
-      setFile(acceptedFiles)
-      fieldChange(acceptedFiles)
-      setFileUrl(URL.createObjectURL(acceptedFiles[0]))
+      fieldChange(acceptedFiles);
+      setFileUrl(URL.createObjectURL(acceptedFiles[0]));
     },
-    [file],
-  )
+    [fieldChange]
+  );
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.png', '.jpeg', '.jpg'],
+      "image/*": [".png", ".jpeg", ".jpg"],
     },
-  })
+  });
 
   return (
     <div {...getRootProps()}>
       <input {...getInputProps()} className="cursor-pointer" />
 
       <div className="cursor-pointer flex-center gap-4">
-        <img
-          src={fileUrl || '/assets/icons/profile-placeholder.svg'}
-          alt="image"
-          className="h-24 w-24 rounded-full object-cover object-top"
-        />
-        <p className="text-primary-500 small-regular md:bbase-semibold">
-          Change profile photo
-        </p>
+        <div className="relative h-24 w-24 rounded-full overflow-hidden">
+          <Image
+            fill
+            src={fileUrl || "/assets/icons/profile-placeholder.svg"}
+            alt="image"
+            className="object-cover object-top"
+          />
+        </div>
+        <p className="text-primary-500 small-regular md:bbase-semibold">Change profile photo</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProfileUploader
+export default ProfileUploader;

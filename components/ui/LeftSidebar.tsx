@@ -20,7 +20,7 @@ const LeftSidebar = async ({user}: {user: User}) => {
             alt="profile"
             width={56}
             height={56}
-            className="rounded-full"
+            className="rounded-full shrink-0 size-14 overflow-hidden object-top object-cover"
           />
 
           <div className="flex flex-col">

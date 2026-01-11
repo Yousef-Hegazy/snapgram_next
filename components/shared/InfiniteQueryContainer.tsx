@@ -1,3 +1,5 @@
+"use client";
+
 import Loader from '@/components/ui/Loader'
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useEffect } from 'react'

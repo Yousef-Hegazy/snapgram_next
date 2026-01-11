@@ -1,6 +1,8 @@
 "use server";
 
+import { QUERY_KEYS } from "@/lib/constants/queryKeys";
 import { and, desc, eq } from "drizzle-orm";
+import { updateTag } from "next/cache";
 import { user } from "../db/auth-schema";
 import { db } from "../db/client";
 import { likes, posts, saves } from "../db/db-schema";
@@ -170,6 +172,8 @@ export async function toggleLikePost(postId: string, userId: string): Promise<Li
     return created;
   });
 
+  updateTag(QUERY_KEYS.GET_POST_BY_ID + postId);
+
   return result;
 }
 
@@ -185,6 +189,8 @@ export async function toggleSavePost(postId: string, userId: string): Promise<Sa
     const [created] = await tx.insert(saves).values({ postId, userId }).returning();
     return created;
   });
+
+  updateTag(QUERY_KEYS.GET_POST_BY_ID + postId);
 
   return result;
 }

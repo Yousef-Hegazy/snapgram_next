@@ -1,7 +1,10 @@
-const ExplorePage = () => {
-  return (
-    <div>ExplorePage</div>
-  )
-}
+import { getCurrentUser } from "@/server/lib/auth";
+import ExploreClient from "./ExploreClient";
 
-export default ExplorePage
+const ExplorePage = async () => {
+  const user = await getCurrentUser();
+
+  return <ExploreClient currentUserId={user?.id} />;
+};
+
+export default ExplorePage;

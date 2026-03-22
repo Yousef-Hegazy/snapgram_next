@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "core.appwrite-yousef.top"
+        hostname: "minio.appwrite-yousef.top"
       }
     ]
   }
